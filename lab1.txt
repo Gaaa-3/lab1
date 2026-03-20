@@ -1,0 +1,74 @@
+
+Guram Tsiklauri
+1 BoxPuzzlee
+
+    Pattern: Composite
+
+    Justification: Crate maintains a collection of   objects  and delegates size() calls to each child, then aggregates results. Both Item and Crate implement the same interface, allowing uniform treatment of leaf and composite objects at runtime.
+
+2 DailyChoice 
+
+    Pattern: Strategy
+
+    Justification: CheckoutDesk holds a reference to a FeeRule interface (object relationship) and delegates the total() calculation to it. Different rule implementations can be swapped at runtime using changeRule(), altering behavior without modifying the desk class.
+
+3 GateMood
+
+    Pattern: State
+
+    Justification: Door holds a Mode reference and delegates push() calls to its current state object (delegation). Each state (OpenMode, ClosedMode) transitions the door to a different state at runtime, causing behavior to change dynamically with each call.
+
+4 KitchenPlan 
+
+    Pattern: Template Method
+
+    Justification: The abstract Meal class defines a final prepare() method with fixed algorithm steps, using inheritance to let subclasses override only the cook() method. This preserves the algorithm structure while allowing varying implementation details.
+
+5 MorningCoffee 
+
+    Pattern: Decorator
+
+    Justification: ExtraCup implements the Cup interface and wraps another Cup object via composition (object relationship). Subclasses like MilkLayer and SugarLayer add behavior before delegating to the wrapped object, and multiple layers are stacked dynamically at runtime.
+
+6 NightShift 
+
+    Pattern: Factory Method
+
+    Justification: Supervisor declares an abstract hire() method and calls it within schedule() (inheritance). Subclasses override hire() to return concrete Worker instances, deferring object creation to subclasses while the parent class controls the algorithm.
+
+7 OldSpeakerPort
+
+    Pattern: Adapter
+
+    Justification: Wire implements the target SoundSource interface while holding a reference to LegacyPlayer (object relationship). It translates the playTrack() call into the incompatible startSong() method, allowing the legacy class to work with the ConferenceRoom client.
+
+8 OnlyOneMic
+
+    Pattern: Singleton
+
+    Justification: Mixer has a private constructor and a static final instance (inheritance/encapsulation). The get() method returns the same instance every time, verified at runtime by the identity check a == b.
+
+9 PrivateShelf 
+
+    Pattern: Proxy
+
+    Justification: CheckedArchive implements the same Archive interface as RealArchive and holds a reference to it (object relationship). It controls access by checking allowed before delegating the fetch() call, providing controlled access at runtime.
+
+10 RemoteClick 
+
+    Pattern: Command
+
+    Justification: Button stores a Step object and delegates press() calls to Step.run() (delegation). StartStep and StopStep encapsulate specific actions on Lamp, allowing the invoker to be decoupled from the receiver and commands to be swapped at runtime.
+
+11 TripStarter 
+
+    Pattern: Facade
+
+    Justification: TripButton provides a single go() method that coordinates calls to multiple subsystem objects (TicketDesk, HotelDesk, TaxiDesk) through composition (object relationship). This simplifies the interface for the client by hiding the complexity of interacting with multiple classes.
+
+12 WatchTower 
+
+    Pattern: Observer
+
+    Justification: WeatherCenter maintains a list of Screen objects (object relationship) and delegates notifications by calling refresh() on each when its state changes at runtime. This establishes a one-to-many dependency where dependents are automatically updated.
+
