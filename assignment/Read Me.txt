@@ -1,0 +1,55 @@
+Guram Tsiklauri
+
+
+# Sorting Benchmark 2
+  
+Guram Tsiklauri  
+Java Development Tools and Best Practices  
+
+## Overview
+
+This project benchmarks four sorting algorithms on large datasets (1,000,000 integers) using JMH (Java Microbenchmark Harness). The goal is to compare theoretical complexity with real-world performance and highlight implementation pitfalls.
+
+## Algorithms Tested
+
+-  Bubble Sort  – with early exit optimization  
+-  Quick Sort  – naive implementation (last element as pivot)  
+-  Radix Sort  – non-comparison based, limited to positive numbers  
+-  Arrays.sort()  – Java’s built-in dual-pivot quicksort (baseline)
+
+## Input Types
+
+- Uniform random  
+- Already sorted  
+- Reverse sorted  
+- Nearly sorted (1% random swaps)
+
+## Key Results
+
+| Algorithm        | Random      | Sorted   | Reverse    | Nearly Sorted |
+|------------------|-------------|----------|------------|---------------|
+| Arrays.sort()    | 86.6 ms     | 1.2 ms   | 1.8 ms     | 30.4 ms       |
+| Bubble Sort      | ~28 min     | 1.1 ms   | ~8 min     | ~10 min       |
+| Quick Sort       | 106.3 ms    | Crashed  | Crashed    | 260.4 ms      |
+| Radix Sort       | Crashed     | Crashed  | Crashed    | Crashed       |
+
+## Observations
+
+-  Arrays.sort()  is the most reliable and efficient across all cases.  
+-  Bubble Sort  is unusable on large datasets except when input is already sorted.  
+-  Quick Sort  fails on sorted and reverse-sorted data due to stack overflow (poor pivot selection).  
+-  Radix Sort  fails on any input containing negative numbers.
+
+## Correctness
+
+All implementations were verified using `SortVerifier` against `Arrays.sort()`. Bubble Sort and Quick Sort passed on positive-only data. Radix Sort failed due to negative number handling.
+
+## Tools
+
+- JMH 1.37  
+- JDK 21  
+- 3 warmup / 5 measurement iterations
+
+## Conclusion
+
+This project demonstrates that algorithm choice, input characteristics, and implementation details all critically impact real-world performance. Theoretical complexity alone is not enough — proper benchmarking and robust implementation are essential.

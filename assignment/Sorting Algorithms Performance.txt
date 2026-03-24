@@ -1,0 +1,32 @@
+Sorting Algorithms Performance Report
+Assignment 1 - Algorithms and Java Benchmarking
+INTRODUCTION
+The goal was simple: take four sorting algorithms, throw a million integers at each of them, and see what happens. We used JMH (Java Microbenchmark Harness) to measure the times properly. JMH warms up the JVM first so the results are actually meaningful. We also tested four different types of input because an algorithm that is fast on random data might completely fall apart on sorted data, and that is exactly what happened here.
+THE ALGORITHMS
+Bubble Sort - the classic. Goes through the array comparing neighbors and swapping them. Does this over and over until nothing moves. We added an early exit so it stops immediately if a full pass completes with no swaps, which makes it fast on already-sorted data but terrible everywhere else.
+Quick Sort - picks a pivot element (we used the last element), puts everything smaller on the left and everything bigger on the right, then repeats recursively. Fast on average but has a known weakness: if the array is already sorted and you always pick the last element as pivot, you get the worst possible case.
+Radix Sort - completely different approach. Does not compare elements at all. Sorts by individual digits from least significant to most significant. Fast in theory but our implementation only handles positive numbers which caused problems.
+Arrays.sort() - Java's built-in sorter. Uses dual-pivot quicksort and has been optimized by the JDK team for decades. Used as our reference.
+SETUP
+N = 1,000,000 integers. JMH 1.37 on JDK 21. 3 warmup iterations, 5 measurement iterations. Results in milliseconds per operation. Four input types: uniform random, already sorted, reverse sorted, and nearly sorted (1% random swaps).
+RESULTS
+Algorithm        | Uniform      | Sorted   | Reverse      | Nearly Sorted
+Arrays.sort()    | 86.6 ms      | 1.2 ms   | 1.8 ms       | 30.4 ms
+Bubble Sort      | 1,690,394 ms | 1.1 ms   | 494,863 ms   | 592,733 ms
+Quick Sort       | 106.3 ms     | CRASHED  | CRASHED      | 260.4 ms
+Radix Sort       | CRASHED      | CRASHED  | CRASHED      | CRASHED
+WHAT ACTUALLY HAPPENED
+Arrays.sort() - the clear winner
+Java's built-in sorter dominated. On sorted and reverse sorted data it finished in about 1-2 ms, basically instant. On random data it took 86 ms which is still very reasonable. The nearly sorted case took 30 ms which is slower than fully random, because Java's quicksort is optimized to detect already-sorted sequences and nearly-sorted data with occasional swaps disrupts that detection.
+Bubble Sort - a disaster with one exception
+On random data Bubble Sort took 1,690,394 ms. That is 28 minutes to sort one array. Arrays.sort() did the same thing in 86 ms. That is a 19,600x difference. On nearly sorted it was 592,733 ms, almost 10 minutes. On reverse sorted, 494,863 ms. The only case where Bubble Sort was competitive was already sorted data at 1.1 ms because the early exit optimization kicks in immediately and finishes after one pass. This perfectly shows what O(n^2) means in practice at scale.
+Quick Sort - fast but it crashed
+On random data Quick Sort did 106 ms which is decent. On nearly sorted it took 260 ms which is worse. But on already sorted and reverse sorted data it crashed with a StackOverflowError. This is the classic worst-case problem with naive quicksort: when the array is already sorted and you always pick the last element as pivot, every partition produces one empty side and one side with n-1 elements. This creates n recursive calls instead of log(n), and with 1,000,000 elements the call stack runs out of memory. This is why real implementations use random pivot or median-of-three selection.
+Radix Sort - crashed on everything
+Radix Sort crashed on all four input types with an ArrayIndexOutOfBoundsException. The reason is that our implementation only handles positive numbers. It uses digit % 10 as an array index, but negative numbers produce negative remainders in Java, giving indices like -5 or -8 which are invalid. A fix would involve separating negative and positive numbers, sorting each group, then combining them.
+KEY TAKEAWAYS
+The biggest lesson is that theoretical complexity and real-world behavior tell very different stories. Bubble Sort's O(n^2) completely destroyed it on large inputs, 28 minutes vs 86 milliseconds for the same task. That is not a small difference, that is the difference between usable and completely unusable.
+Quick Sort's crash on sorted data shows that a correct algorithm on small inputs can fail completely on large ones due to implementation details like pivot choice. This is exactly why production implementations use more sophisticated strategies.
+Input distribution matters just as much as algorithm choice. Arrays.sort() was 72x faster on sorted data versus random data. Knowing your data lets you pick the right tool.
+CORRECTNESS VERIFICATION
+All algorithms were tested using the SortVerifier class. Each algorithm's output was compared against Arrays.sort() using Arrays.equals(). Bubble Sort and Quick Sort passed on positive-only test data. Radix Sort failed on mixed data due to the negative number bug described above.
