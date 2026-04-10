@@ -1,0 +1,10 @@
+
+
+
+Platform      |           Windows          Linux
+Independent
+
+Button        |        WindowsButton    Linux button
+
+Panel         |        WindowsPanel     LinuxPanel
+
